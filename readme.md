@@ -62,4 +62,14 @@ CNode IP   Host IP   Configured Sessions Connected Sessions Silk IQN
 10.12.0.20 10.12.1.6                   4                  4 iqn.2009-01.com.kaminario:storage.k2.1077801
 ```
 
+```Powershell
+# Show the hard connection status for each disk being serviced. 
+Get-SilkDisks
 
+Number SerialNumber 10.12.0.20 10.12.0.21
+------ ------------ ---------- ----------
+     2 1072290000            4          4
+     3 107229000d            4          4
+     4 107229000e            4          4
+     5 107229000f            4          4
+```
