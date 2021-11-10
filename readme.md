@@ -62,4 +62,4 @@ CNode IP   Host IP   Configured Sessions Connected Sessions Silk IQN
 10.12.0.20 10.12.1.6                   4                  4 iqn.2009-01.com.kaminario:storage.k2.1077801
 ```
 
-Specify -Verbose on any cmdlet to see the entire API process, including endoint declarations, and json statements. You can use this to help model API calls directly or troubleshoot. 
+
