@@ -12,7 +12,7 @@
 RootModule = 'silkiscsi.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.2.9'
+ModuleVersion = '0.3.4'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()

@@ -1,8 +1,14 @@
 function Get-SilkSessions {
     param(
         [Parameter()]
-        [ipaddress] $cnodeIP
+        [ipaddress] $cnodeIP,
+        [Parameter()]
+        [switch] $update
     )
+
+    if ($update) {
+        Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
+    }
 
     if ($cnodeIP) {
         $allConnections = Get-IscsiConnection | where-object {$_.TargetAddress -eq $cnodeIP.IPAddressToString}
@@ -37,7 +43,7 @@ function Get-SilkSessions {
     }
 
     if ($returnArray) {
-        return $returnArray | Format-Table
+        return $returnArray | Sort-Object "CNode IP" | Format-Table
     } else {
         return $null
     }
