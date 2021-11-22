@@ -24,14 +24,14 @@ function Get-SilkSessions {
         $o = New-Object psobject
         $o | Add-Member -MemberType NoteProperty -Name "CNode IP" -Value $i
         $o | Add-Member -MemberType NoteProperty -Name "Host IP" -Value ($allConnections | Where-Object {$_.TargetAddress -eq $i} | Select-Object InitiatorAddress -Unique).InitiatorAddress
-        $configured = ($allConnections | Where-Object {$_.TargetAddress -eq $i} | Get-IscsiSession | Where-Object {$_.IsDiscovered}).count
+        $configured = ($allConnections | Where-Object {$_.TargetAddress -eq $i} | Get-IscsiSession | Where-Object {$_.IsDiscovered} | Measure-Object).count
         if ($configured) {
             $o | Add-Member -MemberType NoteProperty -Name "Configured Sessions" -Value $configured
         } else {
             $o | Add-Member -MemberType NoteProperty -Name "Configured Sessions" -Value 0
         }
 
-        $connected = ($allConnections | Where-Object {$_.TargetAddress -eq $i}).count
+        $connected = ($allConnections | Where-Object {$_.TargetAddress -eq $i} | Measure-Object).count
         if ($connected) {
             $o | Add-Member -MemberType NoteProperty -Name "Connected Sessions" -Value $connected
         } else {
