@@ -17,7 +17,7 @@ function Disconnect-SilkCNode {
 
     # Chnage this to a while loop, and put a counter threshold on to run through it perhaps 3 times in case the connections remain after the MPIO claim
     if ($allConnections) {
-        $killSessions =  $allConnections | Get-IscsiSession | Where-Object {$_.IsDiscovered -eq 0}  # ensure unique sessions for the desired portal
+        $killSessions =  $allConnections | Get-IscsiSession  # ensure unique sessions for the desired portal
 
         if ($killSessions) {
             $v = "Discovered " + $killSessions.count + " iscsi sessions to remove."
