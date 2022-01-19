@@ -3,10 +3,19 @@ function Connect-SilkCNode {
         [Parameter()]
         [int] $SessionCount = 1,
         [Parameter(Mandatory)]
-        [ipaddress] $cnodeIP
+        [ipaddress] $cnodeIP,
+        [Parameter()]
+        [switch] $rebalance
     )
 
     # Process
+
+    # information gathering for current status
+
+    $total = Get-SilkSessions -totalOnly
+    if ($rebalance) {
+        $SessionCount = 1
+    }
 
     # Test-Netconnection against the IP to either select the best interface, or validate the specified interface.
 
@@ -23,7 +32,8 @@ function Connect-SilkCNode {
     # Use the decided upon interface to connect
     $v = "Determined interface " + $sourceNic.InterfaceAlias + " as prefered source."
     $iSCSIData1 = Get-NetIPAddress -InterfaceAlias $sourceNic.InterfaceAlias -AddressFamily ipv4
-
+    $cmd = "--> New-IscsiTargetPortal -TargetPortalAddress " + $cnodeIP.IPAddressToString + " -TargetPortalPortNumber 3260 -InitiatorPortalAddress " + $iSCSIData1.IPAddress
+    $cmd | Write-Verbose
     New-IscsiTargetPortal -TargetPortalAddress $cnodeIP.IPAddressToString -TargetPortalPortNumber 3260 -InitiatorPortalAddress $iSCSIData1.IPAddress | Out-Null
     $SDPIQN = Get-IscsiTarget | Where-Object {$_.NodeAddress -match "kaminario"} 
 
@@ -31,6 +41,8 @@ function Connect-SilkCNode {
     while ($session -lt $SessionCount) {
         $v = "Connecting session " + $session + " to " + $cnodeIP.IPAddressToString + " via " + $iSCSIData1.IPAddress
         $v | Write-Verbose
+        $cmd = '--> Connect-IscsiTarget -NodeAddress ' + $SDPIQN.NodeAddress + ' -TargetPortalAddress ' + $cnodeIP.IPAddressToString + ' -TargetPortalPortNumber 3260 -InitiatorPortalAddress ' + $iSCSIData1.IPAddress + ' -IsPersistent $true -IsMultipathEnabled $true'
+        $cmd | Write-Verbose
         Connect-IscsiTarget -NodeAddress $SDPIQN.NodeAddress -TargetPortalAddress $cnodeIP.IPAddressToString -TargetPortalPortNumber 3260 -InitiatorPortalAddress $iSCSIData1.IPAddress -IsPersistent $true -IsMultipathEnabled $true | Out-Null
         $session++
     }
@@ -38,5 +50,15 @@ function Connect-SilkCNode {
     # Return Get-SilkSessions 
 
     $return = Get-SilkSessions 
+
+    if ($rebalance) {
+        $sessions = $total.'Configured Sessions'
+        $cnodes = $total.CNodes
+        $cnodes++
+        $sessionsPer = Get-SilkSessionsPer -nodes $cnodes -sessions $sessions
+        Set-SilkSessionBalance -sessionsPer $sessionsPer
+        $return = Get-SilkSessions
+    }
+
     return $return | Format-Table
 }

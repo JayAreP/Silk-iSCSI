@@ -5,8 +5,13 @@ function Disconnect-SilkCNode {
         [Parameter()]
         [switch] $noUpdate,
         [Parameter()]
-        [switch] $force
+        [switch] $force,
+        [Parameter()]
+        [switch] $rebalance
     )
+
+    # information gathering
+    $total = Get-SilkSessions -totalOnly
 
     # Try clearing the portal LAST...
     $portal = Get-IscsiTargetPortal | Where-Object {$_.TargetPortalAddress -eq $cnodeIP.IPAddressToString}
@@ -33,7 +38,12 @@ function Disconnect-SilkCNode {
                     $k | Remove-SilkFavoriteTarget -ErrorAction SilentlyContinue | Out-Null
                 }
                 
+                $cmd = "--> Unregister-IscsiSession -SessionIdentifier " + $k.SessionIdentifier + 
+                $cmd | Write-Verbose
                 Unregister-IscsiSession -SessionIdentifier $k.SessionIdentifier -ErrorAction SilentlyContinue 
+                
+                $cmd = "--> Disconnect-IscsiTarget -SessionIdentifier " + $k.SessionIdentifier + " -Confirm:0"
+                $cmd | Write-Verbose
                 Disconnect-IscsiTarget -SessionIdentifier $k.SessionIdentifier -Confirm:0 -ErrorAction SilentlyContinue 
                 
             }
@@ -42,6 +52,7 @@ function Disconnect-SilkCNode {
         if (!$noUpdate) {
             $v = "Updating MPIO claim."
             $v | Write-Verbose
+            Write-Verbose "--> Update-MPIOClaimedHW -Confirm:0"
             Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
         }
         
@@ -50,12 +61,21 @@ function Disconnect-SilkCNode {
     if ($portal) {
         $v = "Portal on IP " + $cnodeIP.IPAddressToString + " discovered, removing portal from the configuration."
         $v | Write-Verbose
+        $cmd = "--> Remove-IscsiTargetPortal -TargetPortalAddress " + $cnodeIP.IPAddressToString + " -InitiatorInstanceName " + $portal.InitiatorInstanceName + " -InitiatorPortalAddress " + $portal.InitiatorPortalAddress + " -Confirm:0"
+        $cmd | Write-Verbose
         Remove-IscsiTargetPortal -TargetPortalAddress $cnodeIP.IPAddressToString -InitiatorInstanceName $portal.InitiatorInstanceName -InitiatorPortalAddress $portal.InitiatorPortalAddress -Confirm:0 | Out-Null
+
+        $cmd = "--> Get-IscsiTarget | Update-IscsiTarget"
+        $cmd | Write-Verbose
         Get-IscsiTarget | Update-IscsiTarget -ErrorAction SilentlyContinue | Out-Null
+
+        $cmd = "--> Get-IscsiTargetPortal | Update-IscsiTargetPortal"
+        $cmd | Write-Verbose
         Get-IscsiTargetPortal | Update-IscsiTargetPortal -ErrorAction SilentlyContinue | Out-Null
         if (!$noUpdate) {
             $v = "Updating MPIO claim."
             $v | Write-Verbose
+            Write-Verbose "--> Update-MPIOClaimedHW -Confirm:0"
             Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
         }
     }
@@ -81,7 +101,16 @@ function Disconnect-SilkCNode {
                     $k | Remove-SilkFavoriteTarget -ErrorAction SilentlyContinue | Out-Null
                 }
                 
+                $cmd = "--> Unregister-IscsiSession -SessionIdentifier " + $k.SessionIdentifier 
+                $cmd | Write-Verbose
                 Unregister-IscsiSession -SessionIdentifier $k.SessionIdentifier -ErrorAction SilentlyContinue 
+
+                $cmd = "--> Unregister-IscsiSession -SessionIdentifier " + $k.SessionIdentifier 
+                $cmd | Write-Verbose
+                Unregister-IscsiSession -SessionIdentifier $k.SessionIdentifier -ErrorAction SilentlyContinue 
+
+                $cmd = "--> Disconnect-IscsiTarget -SessionIdentifier " + $k.SessionIdentifier + " -Confirm:0"
+                $cmd | Write-Verbose
                 Disconnect-IscsiTarget -SessionIdentifier $k.SessionIdentifier -Confirm:0 -ErrorAction SilentlyContinue 
                 
             }
@@ -95,8 +124,17 @@ function Disconnect-SilkCNode {
         
     }
 
-    # Now, add the desired number of sessions back in...
     $return = Get-SilkSessions
-    return $return
+
+    if ($rebalance) {
+        $sessions = $total.'Configured Sessions'
+        $cnodes = $total.CNodes
+        $cnodes--
+        $sessionsPer = Get-SilkSessionsPer -nodes $cnodes -sessions $sessions
+        Set-SilkSessionBalance -sessionsPer $sessionsPer
+        $return = Get-SilkSessions
+    }
+
+    return $return | Format-Table
 
 } 
