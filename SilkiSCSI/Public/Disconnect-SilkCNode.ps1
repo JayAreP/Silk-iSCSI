@@ -29,22 +29,19 @@ function Disconnect-SilkCNode {
             $v | Write-Verbose
     
             foreach ($k in $killSessions) {
-                $v = "Removing session " + $k.SessionIdentifier + " from the session list."
-                $v | Write-Verbose
+                $sid = $k.SessionIdentifier
+                Write-Verbose "Removing session $sid from the session list."
                 # catch errors removing silk target
                 if ($force) {
-                    $v = "Removing session " + $k.SessionIdentifier + " from WMI."
-                    $v | Write-Verbose
+                    Write-Verbose "Removing session $sid from WMI."
                     $k | Remove-SilkFavoriteTarget -ErrorAction SilentlyContinue | Out-Null
                 }
                 
-                $cmd = "--> Unregister-IscsiSession -SessionIdentifier " + $k.SessionIdentifier + 
-                $cmd | Write-Verbose
-                Unregister-IscsiSession -SessionIdentifier $k.SessionIdentifier -ErrorAction SilentlyContinue 
+                Write-Verbose "--> Unregister-IscsiSession -SessionIdentifier $sid"
+                Unregister-IscsiSession -SessionIdentifier $sid -ErrorAction SilentlyContinue 
                 
-                $cmd = "--> Disconnect-IscsiTarget -SessionIdentifier " + $k.SessionIdentifier + " -Confirm:0"
-                $cmd | Write-Verbose
-                Disconnect-IscsiTarget -SessionIdentifier $k.SessionIdentifier -Confirm:0 -ErrorAction SilentlyContinue 
+                Write-Verbose "--> Disconnect-IscsiTarget -SessionIdentifier $sid -Confirm:0"
+                Disconnect-IscsiTarget -SessionIdentifier $sid -Confirm:0 -ErrorAction SilentlyContinue 
                 
             }
         }
@@ -80,7 +77,7 @@ function Disconnect-SilkCNode {
         }
     }
 
-    
+    <#
     $allConnections = Get-IscsiConnection | where-object {$_.TargetAddress -eq $cnodeIP.IPAddressToString}
 
     # Chnage this to a while loop, and put a counter threshold on to run through it perhaps 3 times in case the connections remain after the MPIO claim
@@ -123,7 +120,7 @@ function Disconnect-SilkCNode {
         }
         
     }
-
+    #>
     $return = Get-SilkSessions
 
     if ($rebalance) {
