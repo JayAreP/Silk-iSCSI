@@ -36,7 +36,7 @@ Select Install location:
 You can then use the functions in the module manifest to perform the desired operations. 
 ```Powershell
 # Get existing Silk iscsi sessions
-Get-SilkSessions
+Get-SilkSessions | ft
 
 CNode IP   Host IP   Configured Sessions Connected Sessions Silk IQN
 --------   -------   ------------------- ------------------ --------
