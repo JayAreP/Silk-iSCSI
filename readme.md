@@ -36,7 +36,7 @@ Select Install location:
 You can then use the functions in the module manifest to perform the desired operations. 
 ```Powershell
 # Get existing Silk iscsi sessions
-Get-SilkSessions
+Get-SilkSessions | ft
 
 CNode IP   Host IP   Configured Sessions Connected Sessions Silk IQN
 --------   -------   ------------------- ------------------ --------
@@ -69,7 +69,7 @@ Connect-SilkCNode -cnodeIP 10.12.0.22 -rebalance
 CNode IP   Host IP   Configured Sessions Connected Sessions Silk IQN
 --------   -------   ------------------- ------------------ --------
 10.12.0.20 10.12.1.6                   8                  8 iqn.2009-01.com.kaminario:storage.k2.1077801
-10.12.0.21 10.12.1.6                   8                  9 iqn.2009-01.com.kaminario:storage.k2.1077801
+10.12.0.21 10.12.1.6                   8                  8 iqn.2009-01.com.kaminario:storage.k2.1077801
 10.12.0.22 10.12.1.6                   8                  8 iqn.2009-01.com.kaminario:storage.k2.1077801
 ```
 
