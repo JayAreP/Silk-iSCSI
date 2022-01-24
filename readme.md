@@ -84,6 +84,7 @@ CNode IP   Host IP   Configured Sessions Connected Sessions Silk IQN
 
 ```Powershell
 # Show the hard connection status for each disk being serviced. 
+# This is a lengthy query and should only be used for troubleshooting or validation. 
 Get-SilkDisks
 
 Number SerialNumber 10.12.0.20 10.12.0.21
