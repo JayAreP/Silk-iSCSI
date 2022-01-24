@@ -63,7 +63,16 @@ CNode IP   Host IP   Configured Sessions Connected Sessions Silk IQN
 ```
 
 ```Powershell
-# Connect sessions to cnode and automatically rebalance
+# Connect sessions to cnode and automatically re-balance
+# SHow current sessions:
+Get-SilkSessions | ft
+
+CNode IP   Host IP   Configured Sessions Connected Sessions Silk IQN
+--------   -------   ------------------- ------------------ --------
+10.12.0.20 10.12.1.6                  12                 12 iqn.2009-01.com.kaminario:storage.k2.1077801
+10.12.0.21 10.12.1.6                  12                 12 iqn.2009-01.com.kaminario:storage.k2.1077801
+
+# Add 3rd c-node and re-balance
 Connect-SilkCNode -cnodeIP 10.12.0.22 -rebalance
 
 CNode IP   Host IP   Configured Sessions Connected Sessions Silk IQN
