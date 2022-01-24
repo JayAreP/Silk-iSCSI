@@ -64,7 +64,7 @@ CNode IP   Host IP   Configured Sessions Connected Sessions Silk IQN
 
 ```Powershell
 # Connect sessions to cnode and automatically re-balance
-# SHow current sessions:
+# Show current sessions:
 Get-SilkSessions | ft
 
 CNode IP   Host IP   Configured Sessions Connected Sessions Silk IQN
