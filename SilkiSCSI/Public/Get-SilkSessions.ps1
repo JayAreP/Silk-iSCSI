@@ -13,9 +13,21 @@ function Get-SilkSessions {
     }
 
     if ($cnodeIP) {
-        $allConnections = Get-IscsiConnection | where-object {$_.TargetAddress -eq $cnodeIP.IPAddressToString}
+        $allConnections = Get-IscsiConnection -ErrorAction silentlycontinue | where-object {$_.TargetAddress -eq $cnodeIP.IPAddressToString}
+        while (!$allConnections) {
+            Write-Verbose "SCSI query failed - forcing MPIO claim update"
+            Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
+            Start-Sleep -Seconds 4
+            $allConnections = Get-IscsiConnection | where-object {$_.TargetAddress -eq $cnodeIP.IPAddressToString}
+        }
     } else {
-        $allConnections = Get-IscsiConnection 
+        $allConnections = Get-IscsiConnection -ErrorAction silentlycontinue 
+        while (!$allConnections) {
+            Write-Verbose "SCSI query failed - forcing MPIO claim update"
+            Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
+            Start-Sleep -Seconds 4
+            $allConnections = Get-IscsiConnection -ErrorAction silentlycontinue 
+        }
     }
 
     $returnArray = @()

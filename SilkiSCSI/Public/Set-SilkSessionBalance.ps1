@@ -1,10 +1,6 @@
 function Set-SilkSessionBalance {
     param(
         [parameter()]
-        [switch] $up,
-        [parameter()]
-        [switch] $down,
-        [parameter()]
         [int] $sessionsPer
     )
 
@@ -15,16 +11,12 @@ function Set-SilkSessionBalance {
 
     $currentSessions = $total.'Configured Sessions'
     $currentCnodes = $total.CNodes
-    if ($up) {
-        $currentCnodes++
-    }
-    if ($down) {
-        $currentCnodes--
-    }
     
     if (!$sessionsPer) {
         $sessionsPer = Get-SilkSessionsPer -nodes $currentCnodes -sessions $currentSessions
         Write-Verbose "---- Dynamically determined - $sessionsPer - sessions per CNode"
+    } else {
+        Write-Verbose "---- Using - $sessionsPer - sessions per CNode"
     }
 
     foreach ($s in $sessions) {

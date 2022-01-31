@@ -56,6 +56,8 @@ function Connect-SilkCNode {
         $cnodes = $total.CNodes
         $cnodes++
         $sessionsPer = Get-SilkSessionsPer -nodes $cnodes -sessions $sessions
+        $v = "Set-SilkSessionBalance -sessionsPer " + $sessionsPer
+        $v | Write-Verbose
         Set-SilkSessionBalance -sessionsPer $sessionsPer
         $return = Get-SilkSessions
     }
