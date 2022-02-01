@@ -8,6 +8,7 @@ function Remove-SilkStaleSessions {
 
     $killSessions = @()
 
+    $totalSessions = Get-SilkSessions -totalOnly
     $upSessions = Get-IscsiConnection | Get-IscsiSession
     $allSessions = Get-IscsiSession
 
@@ -61,5 +62,8 @@ function Remove-SilkStaleSessions {
             }
         }
     }
+
+    $sessionsPer = Get-SilkSessionsPer -nodes $totalsessions.CNodes -sessions $totalsessions.'Configured Sessions'
+    Set-SilkSessionBalance -sessionsPer $sessionsPer
 
 }
