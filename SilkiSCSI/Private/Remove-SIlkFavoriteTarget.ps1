@@ -10,7 +10,7 @@ function Remove-SilkFavoriteTarget {
         $wmiQuery = Get-WmiObject -Class MSiSCSIInitiator_PersistentLoginClass -Namespace ROOT/WMI
             foreach ($w in $wmiQuery) {
                 if ($w.TargetPortal.Address -eq $cnodeIP.IPAddressToString) {
-                    Remove-WmiObject -InputObject $w
+                    # Remove-WmiObject -InputObject $w
                     $init = $w.InitiatorInstance
                     $target = $w.TargetName
                     $port = $w.InitiatorPortNumber
