@@ -12,9 +12,11 @@ function Get-SilkSessions {
         Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
     }
 
+    $target = Get-IscsiTarget | Where-Object {$_.NodeAddress -match "kaminario"}
+
     if ($cnodeIP) {
         $allConnections = Get-IscsiConnection -ErrorAction silentlycontinue | where-object {$_.TargetAddress -eq $cnodeIP.IPAddressToString}
-        while (!$allConnections) {
+        while (!$allConnections -and $target) {
             Write-Verbose "SCSI query failed - forcing MPIO claim update"
             Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
             Start-Sleep -Seconds 4
@@ -22,7 +24,7 @@ function Get-SilkSessions {
         }
     } else {
         $allConnections = Get-IscsiConnection -ErrorAction silentlycontinue 
-        while (!$allConnections) {
+        while (!$allConnections -and $target) {
             Write-Verbose "SCSI query failed - forcing MPIO claim update"
             Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
             Start-Sleep -Seconds 4
