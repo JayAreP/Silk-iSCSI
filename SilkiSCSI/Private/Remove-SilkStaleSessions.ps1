@@ -56,12 +56,12 @@ function Remove-SilkStaleSessions {
             $cmd = "--> Get-IscsiTargetPortal | Update-IscsiTargetPortal"
             $cmd | Write-Verbose
             Get-IscsiTargetPortal | Update-IscsiTargetPortal -ErrorAction SilentlyContinue | Out-Null
-            if (!$noUpdate) {
-                $v = "Updating MPIO claim."
-                $v | Write-Verbose
-                Write-Verbose "--> Update-MPIOClaimedHW -Confirm:0"
-                Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
-            }
+
+            $v = "Updating MPIO claim."
+            $v | Write-Verbose
+            Write-Verbose "--> Update-MPIOClaimedHW -Confirm:0"
+            Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
+
         }
     }
 

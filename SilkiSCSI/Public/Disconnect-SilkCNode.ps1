@@ -5,7 +5,9 @@ function Disconnect-SilkCNode {
         [Parameter()]
         [switch] $force,
         [Parameter()]
-        [switch] $rebalance
+        [switch] $rebalance,
+        [Parameter()]
+        [switch] $update
     )
 
     # information gathering
@@ -46,11 +48,13 @@ function Disconnect-SilkCNode {
                 
             }
         }
-        
-        $v = "Updating MPIO claim."
-        $v | Write-Verbose
-        Write-Verbose "--> Update-MPIOClaimedHW -Confirm:0"
-        Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
+        if ($update) {
+            $v = "Updating MPIO claim."
+            $v | Write-Verbose
+            Write-Verbose "--> Update-MPIOClaimedHW -Confirm:0"
+            Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
+        }
+
 
     } 
 
@@ -61,14 +65,15 @@ function Disconnect-SilkCNode {
         $cmd | Write-Verbose
         Remove-IscsiTargetPortal -TargetPortalAddress $cnodeIP.IPAddressToString -InitiatorInstanceName $portal.InitiatorInstanceName -InitiatorPortalAddress $portal.InitiatorPortalAddress -Confirm:0 | Out-Null
 
-        $cmd = "--> Get-IscsiTarget | Update-IscsiTarget"
-        $cmd | Write-Verbose
-        Get-IscsiTarget | Update-IscsiTarget -ErrorAction SilentlyContinue | Out-Null
+        if ($update) {
+            $cmd = "--> Get-IscsiTarget | Update-IscsiTarget"
+            $cmd | Write-Verbose
+            Get-IscsiTarget | Update-IscsiTarget -ErrorAction SilentlyContinue | Out-Null
+    
+            $cmd = "--> Get-IscsiTargetPortal | Update-IscsiTargetPortal"
+            $cmd | Write-Verbose
+            Get-IscsiTargetPortal | Update-IscsiTargetPortal -ErrorAction SilentlyContinue | Out-Null
 
-        $cmd = "--> Get-IscsiTargetPortal | Update-IscsiTargetPortal"
-        $cmd | Write-Verbose
-        Get-IscsiTargetPortal | Update-IscsiTargetPortal -ErrorAction SilentlyContinue | Out-Null
-        if (!$noUpdate) {
             $v = "Updating MPIO claim."
             $v | Write-Verbose
             Write-Verbose "--> Update-MPIOClaimedHW -Confirm:0"

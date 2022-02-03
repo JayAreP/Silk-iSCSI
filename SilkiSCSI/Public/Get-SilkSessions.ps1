@@ -34,7 +34,9 @@ function Get-SilkSessions {
 
     $returnArray = @()
 
-    $allTargetIPs = ($allConnections | Select-Object TargetAddress -Unique).TargetAddress
+    # Change this query to Get-IscsiTargetPortal to better represent orphaned target portals.
+    # $allTargetIPs = ($allConnections | Select-Object TargetAddress -Unique).TargetAddress
+    $alltargetIPs = (Get-IscsiTargetPortal).TargetPortalAddress
 
     $configuredTotal = 0 
     $connectedTotal = 0
