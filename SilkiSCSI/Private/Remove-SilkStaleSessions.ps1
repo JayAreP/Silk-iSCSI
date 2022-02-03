@@ -6,6 +6,8 @@ function Remove-SilkStaleSessions {
         [switch] $force
     )
 
+    Write-Verbose ">> Invoking - Remove-SilkStaleSessions"
+
     $killSessions = @()
 
     $totalSessions = Get-SilkSessions -totalOnly
