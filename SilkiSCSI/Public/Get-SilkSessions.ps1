@@ -12,7 +12,7 @@ function Get-SilkSessions {
         Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
     }
 
-    $target = Get-IscsiTarget | Where-Object {$_.NodeAddress -match "kaminario"}
+    $target = Get-IscsiTarget | Where-Object {$_.NodeAddress -match "kaminario" -or $_.NodeAddress -match "silk"}
 
     if ($cnodeIP) {
         $allConnections = Get-IscsiConnection -ErrorAction silentlycontinue | where-object {$_.TargetAddress -eq $cnodeIP.IPAddressToString}

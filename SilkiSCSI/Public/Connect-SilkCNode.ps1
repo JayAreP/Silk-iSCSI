@@ -35,7 +35,7 @@ function Connect-SilkCNode {
     $cmd = "--> New-IscsiTargetPortal -TargetPortalAddress " + $cnodeIP.IPAddressToString + " -TargetPortalPortNumber 3260 -InitiatorPortalAddress " + $iSCSIData1.IPAddress
     $cmd | Write-Verbose
     New-IscsiTargetPortal -TargetPortalAddress $cnodeIP.IPAddressToString -TargetPortalPortNumber 3260 -InitiatorPortalAddress $iSCSIData1.IPAddress | Out-Null
-    $SDPIQN = Get-IscsiTarget | Where-Object {$_.NodeAddress -match "kaminario"} 
+    $SDPIQN = Get-IscsiTarget | Where-Object {$_.NodeAddress -match "kaminario" -or $_.NodeAddress -match "silk"}
 
     $session = 0
     while ($session -lt $SessionCount) {
