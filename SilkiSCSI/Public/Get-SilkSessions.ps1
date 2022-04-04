@@ -16,7 +16,7 @@ function Get-SilkSessions {
 
     if ($cnodeIP) {
         $allConnections = Get-IscsiConnection -ErrorAction silentlycontinue | where-object {$_.TargetAddress -eq $cnodeIP.IPAddressToString}
-        while (!$allConnections -and $target) {
+        if (!$allConnections -and $target) {
             Write-Verbose "SCSI query failed - forcing MPIO claim update"
             Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
             Start-Sleep -Seconds 4
@@ -24,7 +24,7 @@ function Get-SilkSessions {
         }
     } else {
         $allConnections = Get-IscsiConnection -ErrorAction silentlycontinue 
-        while (!$allConnections -and $target) {
+        if (!$allConnections -and $target) {
             Write-Verbose "SCSI query failed - forcing MPIO claim update"
             Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
             Start-Sleep -Seconds 4
@@ -32,6 +32,11 @@ function Get-SilkSessions {
         }
     }
 
+    if (!$allConnections) {
+        Write-Verbose "No connections listed - terminating query"
+        return $null
+    }
+    
     $returnArray = @()
 
     # Change this query to Get-IscsiTargetPortal to better represent orphaned target portals.
